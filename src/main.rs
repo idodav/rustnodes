@@ -132,26 +132,6 @@ impl Clone for Node<InjectNode> {
     }
 }
 
-impl Runnable for Node<DebugNode> {
-    fn run(&self, payload: MessageType) -> RunResult {
-        println!("running debug node");
-        println!("payload:\n{{");
-
-        if let Some(data) = self.data.clone() {
-            if let Some(some_payload) = payload {
-                for output_key in data.output_keys.clone() {
-                    if let Some(value) = some_payload.get(&output_key) {
-                        println!("\t{}:{}", output_key, value);
-                    }
-                }
-            }
-        }
-        println!("}}");
-
-        Ok(true)
-    }
-}
-
 impl Runnable for Node<InjectNode> {
     fn run(&self, payload: MessageType) -> RunResult {
         self.print();
@@ -160,26 +140,49 @@ impl Runnable for Node<InjectNode> {
 
         let outputs = self.outputs.as_slice();
 
-        for output in outputs {
-            output.run(payload.clone());
+        if let Some(some_payload) = self.data.clone() {
+            for output in outputs {
+                output.run(some_payload.payload.clone());
+            }
         }
 
         Ok(true)
     }
 }
 
+impl Runnable for Node<DebugNode> {
+    fn run(&self, payload: MessageType) -> RunResult {
+        println!("running debug node");
+
+        if let Some(data) = self.data.clone() {
+            if let Some(some_payload) = payload {
+                println!("payload:\n{{");
+
+                for output_key in data.output_keys.clone() {
+                    if let Some(value) = some_payload.get(&output_key) {
+                        println!("\t{}:{}", output_key, value);
+                    }
+                }
+                println!("}}");
+            }
+        }
+
+        Ok(true)
+    }
+}
 fn main() {
     let mut debug_node: Node<DebugNode> = Node::new("debug".to_string());
     let mut inject_node: Node<InjectNode> = Node::new("inject".to_string());
 
     debug_node.data = Some(DebugNode {
         message: "hello".to_string(),
-        output_keys: vec!["key1".to_string()],
+        output_keys: vec!["key1".to_string(), "key2".to_string()],
     });
 
     let mut inject_data = HashMap::new();
 
     inject_data.insert("key1".to_string(), "some data".to_string());
+    inject_data.insert("key2".to_string(), "some data 2".to_string());
 
     inject_node.data = Some(InjectNode {
         payload: Some(inject_data),
