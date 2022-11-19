@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, vec};
 
 use uuid::Uuid;
 
@@ -170,9 +170,21 @@ impl Runnable for Node<DebugNode> {
         Ok(true)
     }
 }
+
+struct Flow<'a> {
+    nodes: Vec<&'a Box<dyn FlowNode>>,
+}
+
 fn main() {
+    let mut flow = Flow { nodes: vec![] };
+
     let mut debug_node: Node<DebugNode> = Node::new("debug".to_string());
     let mut inject_node: Node<InjectNode> = Node::new("inject".to_string());
+    let debug_flow_node: Box<FlowNode> = Box::new(debug_node.clone());
+    let inject_flow_node: Box<FlowNode> = Box::new(inject_node.clone());
+
+    flow.nodes.push(&debug_flow_node);
+    flow.nodes.push(&inject_flow_node);
 
     debug_node.data = Some(DebugNode {
         message: "hello".to_string(),
