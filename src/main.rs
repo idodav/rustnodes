@@ -5,6 +5,7 @@ use nodes::debug_node::DebugNode;
 use nodes::flow::Flow;
 use nodes::inject_node::InjectNode;
 use nodes::node::{FlowNode, Node};
+use nodes::split_node::SplitNode;
 
 fn main() {
     let mut flow = Flow { nodes: vec![] };
@@ -38,6 +39,8 @@ fn main() {
             output_keys: vec!["hello".to_string()],
         }),
     ));
+
+    let split_node: Box<dyn FlowNode> = Box::new(Node::<SplitNode>::new("split node".to_string()));
 
     inject_node.add_output(debug_node);
     inject_node.add_output(debug_node1);
