@@ -1,46 +1,41 @@
-use crate::nodes::node::{MessageType, Node, FlowNode, Runnable, RunResult, BasicNode};
+use uuid::Uuid;
+
+use crate::nodes::node::{BasicNode, FlowNode, MessageType, Node, RunResult, Runnable};
 
 #[derive(Clone)]
 pub struct InjectNode {
     pub payload: MessageType,
 }
 
-
-impl FlowNode for Node<InjectNode> {
-    fn clone_dyn(&self) -> Box<dyn FlowNode> {
-        Box::new(self.clone())
+impl<'a> FlowNode for Node<InjectNode> {
+    fn add_output(&mut self, output_node: Box<dyn FlowNode>) {
+        self.outputs.push(output_node);
     }
 }
 
-
-
-impl Clone for Node<InjectNode> {
-    fn clone(&self) -> Self {
-        let mut vec = vec![];
-
-        for item in self.outputs.as_slice() {
-            vec.push(item.clone_dyn());
-        }
-
+impl Node<InjectNode> {
+    pub fn new(name: String, data: Option<InjectNode>) -> Node<InjectNode> {
         Node {
-            id: self.id.clone(),
-            name: self.name.clone(),
-            outputs: vec,
-            data: self.data.clone(),
+            id: Uuid::new_v4().to_string(),
+            name: name,
+            outputs: vec![],
+            data: data,
         }
     }
 }
 
-impl Runnable for Node<InjectNode> {
+impl<'a> Runnable for Node<InjectNode> {
     fn run(&self, payload: MessageType) -> RunResult {
         self.print();
 
         println!("running inject node");
 
         let outputs = self.outputs.as_slice();
+        println!("runnin {} nodes", outputs.len());
 
         if let Some(some_payload) = self.data.clone() {
             for output in outputs {
+                println!("running {}", output.get_id());
                 output.run(some_payload.payload.clone());
             }
         }
