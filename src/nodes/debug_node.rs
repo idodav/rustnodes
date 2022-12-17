@@ -40,7 +40,7 @@ impl Node<DebugNode>{
 
 impl Runnable for Node<DebugNode> {
     fn run(&self, payload: MessageType) -> RunResult {
-        println!("{}",self.getMessage());
+        println!("message: {}",self.getMessage());
 
         if let Some(data) = self.data.clone() {
             if let Some(some_payload) = payload {
