@@ -1,6 +1,11 @@
 use std::collections::HashMap;
+#[derive(Clone)]
+pub enum ObjectValueType {
+    Number(i32),
+    String(String),
+}
 
-pub type MessageType = Option<HashMap<String, String>>;
+pub type MessageType = Option<HashMap<String, ObjectValueType>>;
 
 pub type RunResult = Result<bool, bool>;
 
