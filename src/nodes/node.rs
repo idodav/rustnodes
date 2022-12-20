@@ -1,5 +1,5 @@
-use std::collections::HashMap;
-#[derive(Clone)]
+use std::{collections::HashMap, fmt::Display};
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub enum ObjectValueType {
     Number(i32),
     String(String),

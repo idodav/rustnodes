@@ -48,7 +48,7 @@ impl Runnable for Node<DebugNode> {
 
                 for output_key in data.output_keys.clone() {
                     if let Some(value) = some_payload.get(&output_key) {
-                        println!("\t{}:{}", output_key, value);
+                        println!("\t{}:{:?}", output_key, value);
                     }
                 }
                 println!("}}");

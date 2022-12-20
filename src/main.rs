@@ -4,13 +4,40 @@ use std::collections::HashMap;
 use nodes::debug_node::DebugNode;
 use nodes::flow::Flow;
 use nodes::inject_node::InjectNode;
-use nodes::node::{FlowNode, Node};
-use nodes::split_node::SplitNode;
+use nodes::node::{FlowNode, Node, ObjectValueType};
+use nodes::split_node::{SplitNode, SplitRule};
 
 fn main() {
     let mut flow = Flow { nodes: vec![] };
     let mut injectPayload = HashMap::new();
-    injectPayload.insert("hello".to_string(), "you".to_string());
+    injectPayload.insert(
+        "SplitTo1".to_string(),
+        ObjectValueType::String("true".to_string()),
+    );
+    injectPayload.insert(
+        "SplitTo2".to_string(),
+        ObjectValueType::Number(1),
+    );
+
+    let mut split_node_data = SplitNode {
+        rules: vec![
+            SplitRule {
+                key: "SplitTo1".to_string(),
+                operator: nodes::split_node::SplitRuleOperator::EQ,
+                value: ObjectValueType::String("false".to_string()),
+            },
+            SplitRule {
+                key: "SplitTo2".to_string(),
+                operator: nodes::split_node::SplitRuleOperator::GT,
+                value: ObjectValueType::Number(1),
+            },
+            SplitRule {
+                key: "SplitTo1".to_string(),
+                operator: nodes::split_node::SplitRuleOperator::EQ,
+                value: ObjectValueType::String("false".to_string()),
+            },
+        ],
+    };
     let mut inject_node: Box<dyn FlowNode> = Box::new(Node::<InjectNode>::new(
         "hello".to_string(),
         Some(InjectNode {
@@ -40,13 +67,15 @@ fn main() {
         }),
     ));
 
-    let split_node: Box<dyn FlowNode> = Box::new(Node::<SplitNode>::new("split node".to_string()));
+    let mut split_node: Box<dyn FlowNode> = Box::new(Node::<SplitNode>::new(
+        "split node".to_string(),
+        Some(split_node_data),
+    ));
 
-    inject_node.add_output(debug_node);
-    inject_node.add_output(debug_node1);
-    inject_node.add_output(debug_node2);
-    inject_node.add_output(debug_node3);
-
+    split_node.add_output(debug_node1);
+    split_node.add_output(debug_node2);
+    split_node.add_output(debug_node3);
+    inject_node.add_output(split_node);
     flow.set_nodes(vec![&inject_node]);
 
     let a = flow.get_node_by_id(inject_node.get_id());
