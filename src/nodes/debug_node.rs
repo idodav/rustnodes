@@ -11,7 +11,7 @@ pub struct DebugNode {
 }
 
 impl Node<DebugNode> {
-    pub fn new(name: String,data:Option<DebugNode>) -> Node<DebugNode> {
+    pub fn new(name: String, data: Option<DebugNode>) -> Node<DebugNode> {
         Node {
             id: Uuid::new_v4().to_string(),
             name: name,
@@ -27,20 +27,19 @@ impl FlowNode for Node<DebugNode> {
     }
 }
 
-impl Node<DebugNode>{
+impl Node<DebugNode> {
     fn getMessage(&self) -> String {
-        if let Some(data) = self.data.clone(){
-            self.data.clone().unwrap().message.clone()
-        }else{
+        if let Some(data) = self.data.clone() {
+            data.message.clone()
+        } else {
             "".to_string()
         }
-        
     }
 }
 
 impl Runnable for Node<DebugNode> {
     fn run(&self, payload: MessageType) -> RunResult {
-        println!("message: {}",self.getMessage());
+        println!("message: {}", self.getMessage());
 
         if let Some(data) = self.data.clone() {
             if let Some(some_payload) = payload {

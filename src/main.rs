@@ -6,18 +6,20 @@ use nodes::flow::Flow;
 use nodes::inject_node::InjectNode;
 use nodes::node::{FlowNode, Node, ObjectValueType};
 use nodes::split_node::{SplitNode, SplitRule};
+use uuid::Uuid;
 
 fn main() {
-    let mut flow = Flow { nodes: vec![] };
+    let mut flow = Flow {
+        id: Uuid::new_v4().to_string(),
+        name: "flow1".to_string(),
+        nodes: vec![],
+    };
     let mut injectPayload = HashMap::new();
     injectPayload.insert(
         "SplitTo1".to_string(),
         ObjectValueType::String("true".to_string()),
     );
-    injectPayload.insert(
-        "SplitTo2".to_string(),
-        ObjectValueType::Number(1),
-    );
+    injectPayload.insert("SplitTo2".to_string(), ObjectValueType::Number(1));
 
     let mut split_node_data = SplitNode {
         rules: vec![

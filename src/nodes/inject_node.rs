@@ -26,8 +26,6 @@ impl Node<InjectNode> {
 
 impl<'a> Runnable for Node<InjectNode> {
     fn run(&self, payload: MessageType) -> RunResult {
-        self.print();
-
         println!("running inject node");
 
         let outputs = self.outputs.as_slice();
