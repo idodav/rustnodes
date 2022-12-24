@@ -8,12 +8,38 @@ use nodes::node::{FlowNode, Node, ObjectValueType};
 use nodes::split_node::{SplitNode, SplitRule};
 use uuid::Uuid;
 
-fn main() {
+#[macro_use]
+extern crate rocket;
+
+pub struct ServerState<'a> {
+    flow: Flow<'a>,
+}
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, world!"
+}
+
+#[launch]
+fn rocket() -> _ {
+    let server_state = ServerState {
+        flow: Flow {
+            id: "123".to_string(),
+            name: "flow1".to_string(),
+            nodes: vec![],
+        },
+    };
+
+    rocket::build().mount("/", routes![index])
+}
+
+fn create_and_run_flow() {
     let mut flow = Flow {
         id: Uuid::new_v4().to_string(),
         name: "flow1".to_string(),
         nodes: vec![],
     };
+
     let mut injectPayload = HashMap::new();
     injectPayload.insert(
         "SplitTo1".to_string(),
